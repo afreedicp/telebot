@@ -24,18 +24,18 @@ const App = () => {
 
   const createPoll = async () => {
     const response = await axios.post(
-      'https://api.telegram.org/bot6174041372:AAFeGQ7fooOrEaKYhxhmEjd-apCSMI4Aqlw/sendPoll',
+      `https://api.telegram.org/bot${process.env.REACT_APP_TOKEN}-apCSMI4Aqlw/sendPoll`,
       {
-        chat_id: '1430676787',
+        chat_id: process.env.REACT_APP_ChatId,
         question: question,
         options: options,
         is_anonymous: false,
         type: 'quiz',
       }
     );
+
     setPollId(response.data.result.poll.id);
   };
-
   return (
     <div>
       <h1>Create a Poll</h1>
@@ -75,7 +75,7 @@ const App = () => {
           <p>Your poll has been created with ID {pollId}.</p>
           <p>
             Share this link to allow people to participate: https://t.me/
-            soor_bot?start={pollId}
+            @soor_bot?start={pollId}
           </p>
         </div>
       )}
