@@ -1,9 +1,9 @@
 const { Telegraf } = require('telegraf');
 
-const TOKEN = '6174041372:AAGtI-0SVQFgxzimZLYrlhzV42RQFAsWY38';
+const TOKEN = '6174041372:AAFeGQ7fooOrEaKYhxhmEjd-apCSMI4Aqlw';
 const bot = new Telegraf(TOKEN);
 
-const web_link = 'http://localhost:3001/';
+const web_link = 'http://localhost:3000/';
 bot.command('oldschool', (ctx) => ctx.reply('Hello'));
 bot.command('hipster', Telegraf.reply('λ'));
 bot.command('poll', async (ctx) => {
