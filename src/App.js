@@ -5,6 +5,8 @@ const App = () => {
   const [question, setQuestion] = useState('');
   const [options, setOptions] = useState(['', '']);
   const [pollId, setPollId] = useState('');
+  const [pollMsgId, setPollMsgId] = useState(0);
+  const [pollResults, setPollResults] = useState(null);
 
   const handleOptionChange = (index, event) => {
     const newOptions = [...options];
@@ -23,19 +25,59 @@ const App = () => {
   };
 
   const createPoll = async () => {
+    const response = await axios
+      .post(
+        `https://api.telegram.org/bot${process.env.REACT_APP_TOKEN}/sendPoll`,
+        {
+          chat_id: process.env.REACT_APP_ChatId_1,
+          question: question,
+          options: options,
+          is_anonymous: false,
+          type: 'regular',
+        }
+      )
+      .then((res) => {
+        setPollId(res.data.result.poll.id);
+        setPollMsgId(res.data.result.message_id);
+        setTimeout(() => {
+          // endPoll();
+        }, 5000);
+        const endPoll = async () => {
+          const response = await axios.post(
+            `https://api.telegram.org/bot${process.env.REACT_APP_TOKEN}/stopPoll`,
+            {
+              message_id: res.data.result.message_id,
+              chat_id: process.env.REACT_APP_ChatId_1,
+            }
+          );
+          console.log(response.data);
+        };
+      });
+  };
+
+  const getPollResults = async () => {
     const response = await axios.post(
-      `https://api.telegram.org/bot${process.env.REACT_APP_TOKEN}-apCSMI4Aqlw/sendPoll`,
+      `https://api.telegram.org/bot${process.env.REACT_APP_TOKEN}/getPollResult`,
       {
-        chat_id: process.env.REACT_APP_ChatId,
-        question: question,
-        options: options,
-        is_anonymous: false,
-        type: 'quiz',
+        chat_id: process.env.REACT_APP_ChatId_1,
+        poll_id: pollId,
+        message_id: pollMsgId,
       }
     );
+    if (response.data.ok) {
+      const result = response.data.result;
+      if (result.is_closed && result.total_voter_count >= 2) {
+        console.log(result.options); // array of poll options with votes count
+      } else {
+        console.log('Poll has not ended or has less than 2 participants.');
+      }
+    } else {
+      console.log('Failed to get poll result.');
+    }
 
-    setPollId(response.data.result.poll.id);
+    setPollResults(response.data.result);
   };
+
   return (
     <div>
       <h1>Create a Poll</h1>
@@ -73,10 +115,19 @@ const App = () => {
       {pollId && (
         <div>
           <p>Your poll has been created with ID {pollId}.</p>
-          <p>
-            Share this link to allow people to participate: https://t.me/
-            @soor_bot?start={pollId}
-          </p>
+          <button type='button' onClick={() => getPollResults()}>
+            Get Poll Results
+          </button>
+          {pollResults && (
+            <div>
+              {pollResults.options.map((option, index) => (
+                <div key={index}>
+                  <p>{option.text}</p>
+                  <p>Votes: {option.voter_count}</p>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
     </div>
