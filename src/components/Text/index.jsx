@@ -1,25 +1,18 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+
 import { longPoll } from '../../Api';
-const File = () => {
+const Text = () => {
   const [text, setText] = useState(null);
   const [result, setResult] = useState();
   const telegramRes = () => {
     longPoll((res) =>
       setResult(
-        res.result.filter(
-          (item) =>
-            (item.message && item.message?.document) || item.message?.photo
-        )
+        res.result.filter((item) => item.message && !item.message?.document)
       )
     );
   };
-  const imageCon = (item) => {
-    const base64String = item;
-    const blob = new Blob([atob(base64String)], { type: 'image/png' });
-    const imageUrl = URL.createObjectURL(blob);
-  };
-
+  console.log(result);
   const sendMessage = () => {
     const url = `https://api.telegram.org/bot${process.env.REACT_APP_TOKEN}/sendMessage`;
     const data = { chat_id: process.env.REACT_APP_ChatId_1, text };
@@ -31,9 +24,10 @@ const File = () => {
 
   return (
     <div className='textContainer'>
-      <h1>File uploader</h1>
-      <p> what file to upload ?</p>
-      <input type='text' onChange={(e) => setText(e.target.value)}></input>
+      <h1>Request a Text</h1>
+      <p>ask the question</p>
+
+      <input type='text' onChange={(e) => setText(e.target.value)} />
       <button type='button' className='actionbtn' onClick={sendMessage}>
         Request
       </button>
@@ -48,22 +42,11 @@ const File = () => {
                   : ''
               } `}
             </h4>
-            <p className='docContainer'>
-              {item?.message?.document
-                ? item?.message?.document?.file_name
-                : item?.message?.photo.map((el) => (
-                    <li
-                      className='imageCont'
-                      onClick={() => imageCon(el.file_id)}
-                    >
-                      {el.file_id}
-                    </li>
-                  ))}
-            </p>
+            <p>{item?.message?.text}</p>
           </div>
         ))}
     </div>
   );
 };
 
-export default File;
+export default Text;

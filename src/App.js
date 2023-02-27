@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
-import axios from './Api/axios';
-import { longPoll } from './Api';
+
 import './App.css';
 import File from './components/File';
 import Poll from './components/Poll';
+import Text from './components/Text';
 
 const App = () => {
   const [activeComp, setActiveComp] = useState('poll');
@@ -13,25 +13,39 @@ const App = () => {
       <div>
         <div className='buttonContainer'>
           <button
-            className='compButtons'
+            className={`compButtons ${activeComp === 'poll' && 'active'}`}
             onClick={() => {
               setActiveComp('poll');
             }}
           >
             Poll
           </button>
-          <button className='compButtons' onClick={() => setActiveComp('text')}>
+          <button
+            className={`compButtons ${activeComp === 'text' && 'active'}`}
+            onClick={() => setActiveComp('text')}
+          >
             Text
           </button>
-          <button className='compButtons' onClick={() => setActiveComp('file')}>
+          <button
+            className={`compButtons ${activeComp === 'file' && 'active'}`}
+            onClick={() => setActiveComp('file')}
+          >
             Upload
           </button>
         </div>
-        <div className='compContainer'>{activeComp === 'poll' && <Poll />}</div>
-        <div className='compContainer'>{activeComp === 'file' && <File />}</div>
-      </div>
-      <div>
-        <button onClick={() => longPoll()}>result</button>
+        {activeComp === 'poll' ? (
+          <div className='compContainer'>
+            <Poll />
+          </div>
+        ) : activeComp === 'file' ? (
+          <div className='compContainer'>
+            <File />
+          </div>
+        ) : (
+          <div className='compContainer'>
+            <Text />
+          </div>
+        )}
       </div>
     </>
   );

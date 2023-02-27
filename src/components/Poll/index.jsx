@@ -1,13 +1,21 @@
 import { useState } from 'react';
 import axios from 'axios';
 import './styles.css';
+import { longPoll } from '../../Api';
 const Poll = () => {
   const [question, setQuestion] = useState('');
   const [options, setOptions] = useState(['', '']);
   const [pollId, setPollId] = useState('');
-  const [pollMsgId, setPollMsgId] = useState(0);
-  const [pollResults, setPollResults] = useState(null);
-
+  const [result, setResult] = useState();
+  const telegramRes = () => {
+    longPoll((res) =>
+      setResult(
+        res.result
+          .reverse()
+          ?.find((item) => item.poll && item.poll.id === pollId)
+      )
+    );
+  };
   const handleOptionChange = (index, event) => {
     const newOptions = [...options];
     newOptions[index] = event.target.value;
@@ -38,46 +46,9 @@ const Poll = () => {
       )
       .then((res) => {
         setPollId(res.data.result.poll.id);
-        setPollMsgId(res.data.result.message_id);
-        //    setTimeout(() => {
-        // endPoll();
-        //    }, 5000);
-        //    const endPoll = async () => {
-        //      const response = await axios.post(
-        //        `https://api.telegram.org/bot${process.env.REACT_APP_TOKEN}/stopPoll`,
-        //        {
-        //          message_id: res.data.result.message_id,
-        //          chat_id: process.env.REACT_APP_ChatId_1,
-        //        }
-        //      );
-        //      console.log(response.data);
-        //    };
       });
   };
-
-  const getPollResults = async () => {
-    const response = await axios.post(
-      `https://api.telegram.org/bot${process.env.REACT_APP_TOKEN}/getPollResult`,
-      {
-        chat_id: process.env.REACT_APP_ChatId_1,
-        poll_id: pollId,
-        message_id: pollMsgId,
-      }
-    );
-    if (response.data.ok) {
-      const result = response.data.result;
-      if (result.is_closed && result.total_voter_count >= 2) {
-        console.log(result.options); // array of poll options with votes count
-      } else {
-        console.log('Poll has not ended or has less than 2 participants.');
-      }
-    } else {
-      console.log('Failed to get poll result.');
-    }
-
-    setPollResults(response.data.result);
-  };
-
+  // console.log(result);
   return (
     <div>
       <h1>Create a Poll</h1>
@@ -99,6 +70,7 @@ const Poll = () => {
           />
           <button
             type='button'
+            className='remNtn'
             onClick={() => removeOption(index)}
             disabled={options.length <= 2}
           >
@@ -112,24 +84,27 @@ const Poll = () => {
       <button className='actionbtn' type='button' onClick={createPoll}>
         Create Poll
       </button>
-      {pollId && (
-        <div>
-          <p>Your poll has been created with ID {pollId}.</p>
-          <button type='button' onClick={() => getPollResults()}>
-            Get Poll Results
-          </button>
-          {pollResults && (
+      <div className='result-container'>
+        <button onClick={() => telegramRes()} disabled={!pollId}>
+          result
+        </button>
+
+        {result && (
+          <div>
             <div>
-              {pollResults.options.map((option, index) => (
-                <div key={index}>
-                  <p>{option.text}</p>
-                  <p>Votes: {option.voter_count}</p>
-                </div>
-              ))}
+              <h4>Q: {result.poll?.question}</h4>
+              <p>
+                {' '}
+                {result.poll?.options.map((element) => (
+                  <ul key={element.update_id}>
+                    <li>{`${element.text}  has  ${element.voter_count} votes.`}</li>
+                  </ul>
+                ))}
+              </p>
             </div>
-          )}
-        </div>
-      )}
+          </div>
+        )}
+      </div>
     </div>
   );
 };
