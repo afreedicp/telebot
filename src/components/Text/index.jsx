@@ -66,7 +66,7 @@ const Text = () => {
   return (
     <div className='textContainer'>
       <h1>Request a Text</h1>
-      <p>ask the question</p>
+      <p>ask a question</p>
 
       <input type='text' onChange={(e) => setText(e.target.value)} />
       <button type='button' className='actionbtn' onClick={sendMessage}>

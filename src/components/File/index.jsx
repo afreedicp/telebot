@@ -65,7 +65,7 @@ const File = () => {
   return (
     <div className='textContainer'>
       <h1>File uploader</h1>
-      <p> what file to upload ?</p>
+      <p> Ask for a file ?</p>
       <input type='text' onChange={(e) => setText(e.target.value)}></input>
       <button type='button' className='actionbtn' onClick={sendMessage}>
         Request
