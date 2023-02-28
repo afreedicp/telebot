@@ -49,3 +49,24 @@
   padding: 10px;
   font-size: 18px;
 }
+input {
+  margin-top: 10px;
+}
+.actionbtn {
+  margin: 20px 20px;
+}
+.remNtn {
+  margin-left: 10px;
+}
+
+.languagecontainer {
+  display: flex;
+  justify-content: end;
+}
+.selectfield {
+  width: 200px;
+  height: 30px;
+}
+.LangSelector {
+  margin-top: 10px;
+}
