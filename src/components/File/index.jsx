@@ -2,131 +2,69 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { longPoll } from '../../Api';
 const File = () => {
-  const [text, setText] = useState(null);
-  const [result, setResult] = useState();
-  const [selectedLang, setselcetedLang] = useState();
+  const [file, setFile] = useState(null);
+  const [caption, setCaption] = useState('');
+  const [message, setMessage] = useState('');
   const [selectedGroup, setselectedGroup] = useState(
     process.env.REACT_APP_ChatId_1
   );
-  const [languages, setLanguages] = useState();
-  const telegramRes = () => {
-    longPoll((res) =>
-      setResult(
-        res.result.filter(
-          (item) =>
-            item.message &&
-            (item.message?.document || item.message?.photo) &&
-            item.message.chat.id == selectedGroup
-        )
-      )
-    );
+  const handleFileChange = (event) => {
+    setFile(event.target.files[0]);
   };
-  useEffect(() => {
-    axios.get(`https://libretranslate.de/languages`).then((response) => {
-      setLanguages(response.data);
-    });
-  }, []);
+
+  const handleCaptionChange = (event) => {
+    setCaption(event.target.value);
+  };
+
   console.log(selectedGroup);
-  const sendMessage = async () => {
-    if (selectedLang) {
-      let data1 = {
-        q: text,
-        source: 'en',
-        target: selectedLang,
-      };
-      const transText = await axios
-        .post(`https://libretranslate.de/translate`, { ...data1, q: text })
-        .then((response) => {
-          console.log(response.data);
-          return response.data.translatedText;
-        });
-      const url = `https://api.telegram.org/bot${process.env.REACT_APP_TOKEN}/sendMessage`;
-      const data = {
-        chat_id: selectedGroup,
-        text: transText,
-      };
-      await axios
-        .post(url, data)
-        .then((response) => console.log(response.data))
-        .catch((error) => console.log(error));
-    } else {
-      const url = `https://api.telegram.org/bot${process.env.REACT_APP_TOKEN}/sendMessage`;
-      const data = {
-        chat_id: selectedGroup,
-        text: text,
-      };
-      await axios
-        .post(url, data)
-        .then((response) => console.log(response.data))
-        .catch((error) => console.log(error));
-    }
+  const sendDocument = async () => {
+    const formData = new FormData();
+    formData.append('document', file);
+    formData.append('caption', caption);
+    const response = await axios.post(
+      `https://api.telegram.org/bot${process.env.REACT_APP_TOKEN}/sendDocument`,
+      formData,
+      {
+        params: {
+          chat_id: selectedGroup,
+        },
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      }
+    );
+    setMessage(`File ${file.name} sent with caption "${caption}".`);
   };
 
   return (
-    <div className='textContainer'>
-      <h1>File uploader</h1>
-      <p> Ask for a file ?</p>
-      <input type='text' onChange={(e) => setText(e.target.value)}></input>
-      <button type='button' className='actionbtn' onClick={sendMessage}>
-        Request
+    <div>
+      <h1>Upload a File</h1>
+      <label htmlFor='file'>File:</label>
+      <input type='file' id='file' accept='*' onChange={handleFileChange} />
+      <label htmlFor='caption'>Caption:</label>
+      <input
+        type='text'
+        id='caption'
+        value={caption}
+        onChange={handleCaptionChange}
+      />
+      <button type='button' onClick={sendDocument} disabled={!file}>
+        Upload
       </button>
-      <div className='selectDiv'>
-        <div className='languagecontainer'>
-          Language:
-          <select
-            className='selectfield'
-            name='language'
-            onChange={(e) => {
-              setselcetedLang(e.target.value);
-            }}
-          >
-            {languages &&
-              languages?.map((item) => (
-                <option value={item.code}>{item.name}</option>
-              ))}
-          </select>
-        </div>
-        <div className='languagecontainer'>
-          Group:
-          <select
-            className='selectfield'
-            name='groupName'
-            onChange={(e) => {
-              setselectedGroup(e.target.value);
-            }}
-          >
-            <option value={process.env.REACT_APP_ChatId_1}>Bot test</option>
-            <option value={process.env.REACT_APP_ChatId_2}>Bot Test 2</option>
-          </select>
-        </div>
+      <div className='languagecontainer'>
+        Group:
+        <select
+          className='selectfield'
+          name='groupName'
+          onChange={(e) => {
+            setselectedGroup(e.target.value);
+          }}
+        >
+          <option value={process.env.REACT_APP_ChatId_1}>Bot test</option>
+          <option value={process.env.REACT_APP_ChatId_2}>Bot Test 2</option>
+        </select>
       </div>
-      <button className='resultBtn' onClick={() => telegramRes()}>
-        Result
-      </button>
-      {result?.length > 0 &&
-        result.map((item) => (
-          <div key={item?.message_id}>
-            <h4>
-              {` ${item?.message?.from?.first_name} ${
-                item?.message?.from?.last_name
-                  ? item?.message?.from?.last_name
-                  : ''
-              } `}
-            </h4>
-            <p className='docContainer'>
-              {item?.message?.document
-                ? item?.message?.document?.file_name
-                : item?.message?.photo.map((el) => (
-                    <li
-                      className='imageCont'
-                      // onClick={() => imageCon(el.file_id)}
-                    >
-                      {el.file_id}
-                    </li>
-                  ))}
-            </p>
-          </div>
-        ))}
+      {message && <p>{message}</p>}
     </div>
   );
 };
