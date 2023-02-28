@@ -1,6 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import axios from 'axios';
-import { longPoll } from '../../Api';
 const File = () => {
   const [file, setFile] = useState(null);
   const [caption, setCaption] = useState('');
