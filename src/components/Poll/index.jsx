@@ -139,6 +139,7 @@ const Poll = () => {
       </button>
       <div className='LangSelector'>
         <div className='languagecontainer'>
+          Language:
           <select
             className='selectfield'
             name='language'
@@ -152,8 +153,9 @@ const Poll = () => {
               ))}
           </select>
         </div>
-      </div>
+      
       <div className='languagecontainer'>
+        Group:
         <select
           className='selectfield'
           name='groupName'
@@ -165,8 +167,9 @@ const Poll = () => {
           <option value={process.env.REACT_APP_ChatId_2}>Bot Test 2</option>
         </select>
       </div>
+      </div>
       <div className='result-container'>
-        <button onClick={() => telegramRes()} disabled={!pollId}>
+        <button  onClick={() => telegramRes()} disabled={!pollId}>
           result
         </button>
 

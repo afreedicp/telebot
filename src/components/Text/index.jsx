@@ -65,7 +65,9 @@ const Text = () => {
       <button type='button' className='actionbtn' onClick={sendMessage}>
         Request
       </button>
+      <div className='selectDiv'>
       <div className='languagecontainer'>
+        Language:
         <select
           className='selectfield'
           name='language'
@@ -80,6 +82,7 @@ const Text = () => {
         </select>
       </div>
       <div className='languagecontainer'>
+        Group:
         <select
           className='selectfield'
           name='groupName'
@@ -91,7 +94,8 @@ const Text = () => {
           <option value={process.env.REACT_APP_ChatId_2}>Bot Test 2</option>
         </select>
       </div>
-      <button onClick={() => telegramRes()}>Result</button>
+      </div>
+      <button className='resultBtn' onClick={() => telegramRes()}>Result</button>
       {result?.length > 0 &&
         result.map((item) => (
           <div key={item?.message_id}>
