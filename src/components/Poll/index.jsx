@@ -9,7 +9,9 @@ const Poll = () => {
   const [result, setResult] = useState();
   const [selectedLang, setselcetedLang] = useState();
 
-  const [selectedGroup, setselectedGroup] = useState();
+  const [selectedGroup, setselectedGroup] = useState(
+    process.env.REACT_APP_ChatId_1
+  );
   const [languages, setLanguages] = useState();
   const telegramRes = () => {
     longPoll((res) =>
@@ -102,7 +104,7 @@ const Poll = () => {
   return (
     <div>
       <h1>Create a Poll</h1>
-      <label htmlFor='question'>Question:</label>
+      <label htmlFor='question'>Question : </label>
       <input
         type='text'
         id='question'
@@ -112,11 +114,11 @@ const Poll = () => {
       <div className='input-Container'>
         {options.map((option, index) => (
           <div key={index}>
-            <label htmlFor={`option${index}`}>Option {index + 1}:</label>
+            <label htmlFor={`option${index}`}>Option {index + 1} : </label>
             <input
               className='inputField'
               type='text'
-              id={`option${index}`}
+              id={`option ${index}`}
               value={option}
               onChange={(e) => handleOptionChange(index, e)}
             />
@@ -153,23 +155,23 @@ const Poll = () => {
               ))}
           </select>
         </div>
-      
-      <div className='languagecontainer'>
-        Group:
-        <select
-          className='selectfield'
-          name='groupName'
-          onChange={(e) => {
-            setselectedGroup(e.target.value);
-          }}
-        >
-          <option value={process.env.REACT_APP_ChatId_1}>Bot test</option>
-          <option value={process.env.REACT_APP_ChatId_2}>Bot Test 2</option>
-        </select>
-      </div>
+
+        <div className='languagecontainer'>
+          Group:
+          <select
+            className='selectfield'
+            name='groupName'
+            onChange={(e) => {
+              setselectedGroup(e.target.value);
+            }}
+          >
+            <option value={process.env.REACT_APP_ChatId_1}>Bot test</option>
+            <option value={process.env.REACT_APP_ChatId_2}>Bot Test 2</option>
+          </select>
+        </div>
       </div>
       <div className='result-container'>
-        <button  onClick={() => telegramRes()} disabled={!pollId}>
+        <button onClick={() => telegramRes()} disabled={!pollId}>
           result
         </button>
 

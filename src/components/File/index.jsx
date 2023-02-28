@@ -5,14 +5,18 @@ const File = () => {
   const [text, setText] = useState(null);
   const [result, setResult] = useState();
   const [selectedLang, setselcetedLang] = useState();
-  const [selectedGroup, setselectedGroup] = useState();
+  const [selectedGroup, setselectedGroup] = useState(
+    process.env.REACT_APP_ChatId_1
+  );
   const [languages, setLanguages] = useState();
   const telegramRes = () => {
     longPoll((res) =>
       setResult(
         res.result.filter(
           (item) =>
-            (item.message && item.message?.document) || item.message?.photo
+            item.message &&
+            (item.message?.document || item.message?.photo) &&
+            item.message.chat.id == selectedGroup
         )
       )
     );
@@ -22,7 +26,7 @@ const File = () => {
       setLanguages(response.data);
     });
   }, []);
-
+  console.log(selectedGroup);
   const sendMessage = async () => {
     if (selectedLang) {
       let data1 = {
@@ -67,36 +71,38 @@ const File = () => {
         Request
       </button>
       <div className='selectDiv'>
-      <div className='languagecontainer'>
-        Language:
-        <select
-          className='selectfield'
-          name='language'
-          onChange={(e) => {
-            setselcetedLang(e.target.value);
-          }}
-        >
-          {languages &&
-            languages?.map((item) => (
-              <option value={item.code}>{item.name}</option>
-            ))}
-        </select>
+        <div className='languagecontainer'>
+          Language:
+          <select
+            className='selectfield'
+            name='language'
+            onChange={(e) => {
+              setselcetedLang(e.target.value);
+            }}
+          >
+            {languages &&
+              languages?.map((item) => (
+                <option value={item.code}>{item.name}</option>
+              ))}
+          </select>
+        </div>
+        <div className='languagecontainer'>
+          Group:
+          <select
+            className='selectfield'
+            name='groupName'
+            onChange={(e) => {
+              setselectedGroup(e.target.value);
+            }}
+          >
+            <option value={process.env.REACT_APP_ChatId_1}>Bot test</option>
+            <option value={process.env.REACT_APP_ChatId_2}>Bot Test 2</option>
+          </select>
+        </div>
       </div>
-      <div className='languagecontainer'>
-        Group:
-        <select
-          className='selectfield'
-          name='groupName'
-          onChange={(e) => {
-            setselectedGroup(e.target.value);
-          }}
-        >
-          <option value={process.env.REACT_APP_ChatId_1}>Bot test</option>
-          <option value={process.env.REACT_APP_ChatId_2}>Bot Test 2</option>
-        </select>
-      </div>
-      </div>
-      <button className='resultBtn' onClick={() => telegramRes()}>Result</button>
+      <button className='resultBtn' onClick={() => telegramRes()}>
+        Result
+      </button>
       {result?.length > 0 &&
         result.map((item) => (
           <div key={item?.message_id}>
