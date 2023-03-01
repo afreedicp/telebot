@@ -14,10 +14,9 @@ const Text = () => {
     longPoll((res) =>
       setResult(
         res.result.filter(
-          (item) =>
-            item.message &&
-            !item.message?.document &&
-            item.message.chat.id == selectedGroup
+          (item) => item.message && !item.message?.document
+          // &&
+          // item.message.chat.id == selectedGroup
         )
       )
     );

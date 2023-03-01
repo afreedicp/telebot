@@ -7,6 +7,10 @@ const File = () => {
   const [selectedGroup, setselectedGroup] = useState(
     process.env.REACT_APP_ChatId_1
   );
+  const allgroup = [
+    process.env.REACT_APP_ChatId_1,
+    process.env.REACT_APP_ChatId_2,
+  ];
   const handleFileChange = (event) => {
     setFile(event.target.files[0]);
   };
@@ -20,27 +24,45 @@ const File = () => {
     const formData = new FormData();
     formData.append('document', file);
     formData.append('caption', caption);
-    const response = await axios.post(
-      `https://api.telegram.org/bot${process.env.REACT_APP_TOKEN}/sendDocument`,
-      formData,
-      {
-        params: {
-          chat_id: selectedGroup,
-        },
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      }
-    );
+    if (selectedGroup !== 'All') {
+      const response = await axios.post(
+        `https://api.telegram.org/bot${process.env.REACT_APP_TOKEN}/sendDocument`,
+        formData,
+        {
+          params: {
+            chat_id: selectedGroup,
+          },
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        }
+      );
+    } else {
+      allgroup.map(async (item) => {
+        const response = await axios.post(
+          `https://api.telegram.org/bot${process.env.REACT_APP_TOKEN}/sendDocument`,
+          formData,
+          {
+            params: {
+              chat_id: item,
+            },
+            headers: {
+              'Content-Type': 'multipart/form-data',
+            },
+          }
+        );
+      });
+    }
+
     setMessage(`File ${file.name} sent with caption "${caption}".`);
   };
 
   return (
     <div>
       <h1>Upload a File</h1>
-      <label htmlFor='file'>File:</label>
+      <label htmlFor='file'>File : </label>
       <input type='file' id='file' accept='*' onChange={handleFileChange} />
-      <label htmlFor='caption'>Caption:</label>
+      <label htmlFor='caption'>Caption : </label>
       <input
         type='text'
         id='caption'
@@ -61,6 +83,7 @@ const File = () => {
         >
           <option value={process.env.REACT_APP_ChatId_1}>Bot test</option>
           <option value={process.env.REACT_APP_ChatId_2}>Bot Test 2</option>
+          <option value={'All'}>All</option>
         </select>
       </div>
       {message && <p>{message}</p>}
